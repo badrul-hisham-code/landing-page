@@ -3,9 +3,13 @@ import { useFrame } from '@react-three/fiber';
 import { Sphere, MeshDistortMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
-const SunModel = ({ scrollOffset = 0 }) => {
-  const sunRef = useRef();
-  const glowRef = useRef();
+interface SunModelProps {
+  scrollOffset?: number;
+}
+
+const SunModel: React.FC<SunModelProps> = ({ scrollOffset = 0 }) => {
+  const sunRef = useRef<THREE.Mesh>(null);
+  const glowRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
     if (sunRef.current) {

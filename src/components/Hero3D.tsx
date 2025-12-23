@@ -1,13 +1,14 @@
 import { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, ScrollControls, useScroll, PerspectiveCamera, Environment } from '@react-three/drei';
+import { ScrollControls, useScroll, PerspectiveCamera, Environment } from '@react-three/drei';
+import * as THREE from 'three';
 import SunModel from './SunModel';
 import MoonModel from './MoonModel';
 
 // Camera animation component
 function CameraRig() {
   const scroll = useScroll();
-  const cameraRef = useRef();
+  const cameraRef = useRef<THREE.PerspectiveCamera>(null);
 
   useFrame(() => {
     if (cameraRef.current && scroll) {
@@ -33,7 +34,11 @@ function CameraRig() {
 }
 
 // Scene component that receives theme
-function Scene({ theme }) {
+interface SceneProps {
+  theme: string;
+}
+
+function Scene({ theme }: SceneProps) {
   const scroll = useScroll();
   const [scrollOffset, setScrollOffset] = useState(0);
 

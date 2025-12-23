@@ -1,11 +1,15 @@
 import { useRef } from 'react';
-import { useFrame, useLoader } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Sphere } from '@react-three/drei';
 import * as THREE from 'three';
 
-const MoonModel = ({ scrollOffset = 0 }) => {
-  const moonRef = useRef();
-  const glowRef = useRef();
+interface MoonModelProps {
+  scrollOffset?: number;
+}
+
+const MoonModel: React.FC<MoonModelProps> = ({ scrollOffset = 0 }) => {
+  const moonRef = useRef<THREE.Mesh>(null);
+  const glowRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
     if (moonRef.current) {
@@ -28,11 +32,15 @@ const MoonModel = ({ scrollOffset = 0 }) => {
   });
 
   // Create procedural crater texture
-  const createCraterTexture = () => {
+  const createCraterTexture = (): THREE.CanvasTexture => {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      throw new Error('Could not get 2D context');
+    }
 
     // Base moon color
     ctx.fillStyle = '#e0e0e0';
