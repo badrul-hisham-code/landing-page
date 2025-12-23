@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { ScrollControls, useScroll, PerspectiveCamera, Environment } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
+import { PerspectiveCamera, Environment } from '@react-three/drei';
 import SunModel from './SunModel';
 import MoonModel from './MoonModel';
 import StoryIcon3D from './StoryIcon3D';
@@ -13,21 +13,16 @@ interface Hero3DProps {
 interface SceneProps {
   theme: string;
   onScrollUpdate?: (progress: number) => void;
+  scrollOffset: number;
 }
 
-function Scene({ theme, onScrollUpdate }: SceneProps) {
-  const scroll = useScroll();
-  const [scrollOffset, setScrollOffset] = useState(0);
-
-  useFrame(() => {
-    if (scroll) {
-      const offset = scroll.offset;
-      setScrollOffset(offset);
-      if (onScrollUpdate) {
-        onScrollUpdate(offset);
-      }
+function Scene({ theme, onScrollUpdate, scrollOffset }: SceneProps) {
+  // Notify parent of scroll progress when it changes
+  useEffect(() => {
+    if (onScrollUpdate) {
+      onScrollUpdate(scrollOffset);
     }
-  });
+  }, [scrollOffset, onScrollUpdate]);
 
   // Determine which story icons to show based on scroll position
   const currentPage = Math.floor(scrollOffset * 4);
@@ -81,26 +76,40 @@ const Hero3D: React.FC<Hero3DProps> = ({ onScrollUpdate }) => {
     return savedTheme || 'light';
   });
 
+  // Track scroll offset from window
+  const [scrollOffset, setScrollOffset] = useState(0);
+
   useEffect(() => {
     const observer = new MutationObserver(() => {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       setTheme(isDark ? 'dark' : 'light');
     });
-
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-theme'],
     });
-
     return () => observer.disconnect();
   }, []);
+
+  // Native scroll listener
+  useEffect(() => {
+    const handleScroll = () => {
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const offset = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      setScrollOffset(offset);
+      if (onScrollUpdate) onScrollUpdate(offset);
+    };
+    window.addEventListener('scroll', handleScroll);
+    // Initialize
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [onScrollUpdate]);
 
   return (
     <div className="hero-3d-background">
       <Canvas>
-        <ScrollControls pages={4} damping={0.1}>
-          <Scene theme={theme} onScrollUpdate={onScrollUpdate} />
-        </ScrollControls>
+        {/* Pass scrollOffset to Scene via prop */}
+        <Scene theme={theme} onScrollUpdate={onScrollUpdate} scrollOffset={scrollOffset} />
       </Canvas>
     </div>
   );
