@@ -1,52 +1,41 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ScrollControls, useScroll, PerspectiveCamera, Environment } from '@react-three/drei';
-import * as THREE from 'three';
 import SunModel from './SunModel';
 import MoonModel from './MoonModel';
+import StoryIcon3D from './StoryIcon3D';
 
-// Camera animation component
-function CameraRig() {
-  const scroll = useScroll();
-  const cameraRef = useRef<THREE.PerspectiveCamera>(null);
-
-  useFrame(() => {
-    if (cameraRef.current && scroll) {
-      const offset = scroll.offset;
-      
-      // Move camera based on scroll
-      cameraRef.current.position.y = -offset * 5;
-      cameraRef.current.position.z = 8 - offset * 2;
-      
-      // Look at center
-      cameraRef.current.lookAt(0, -offset * 3, 0);
-    }
-  });
-
-  return (
-    <PerspectiveCamera
-      ref={cameraRef}
-      makeDefault
-      position={[0, 0, 8]}
-      fov={75}
-    />
-  );
+interface Hero3DProps {
+  onScrollUpdate?: (progress: number) => void;
 }
 
-// Scene component that receives theme
+// Scene component that receives theme and scroll
 interface SceneProps {
   theme: string;
+  onScrollUpdate?: (progress: number) => void;
 }
 
-function Scene({ theme }: SceneProps) {
+function Scene({ theme, onScrollUpdate }: SceneProps) {
   const scroll = useScroll();
   const [scrollOffset, setScrollOffset] = useState(0);
 
   useFrame(() => {
     if (scroll) {
-      setScrollOffset(scroll.offset);
+      const offset = scroll.offset;
+      setScrollOffset(offset);
+      if (onScrollUpdate) {
+        onScrollUpdate(offset);
+      }
     }
   });
+
+  // Determine which story icons to show based on scroll position
+  const currentPage = Math.floor(scrollOffset * 4);
+  const stories = theme === 'dark' 
+    ? ['terminal', 'rocket', 'energy'] as const
+    : ['coffee', 'laptop', 'blueprint'] as const;
+  
+  const iconPosition: [number, number, number] = theme === 'dark' ? [5, 0, 2] : [-5, 0, 2];
 
   return (
     <>
@@ -67,28 +56,32 @@ function Scene({ theme }: SceneProps) {
         <SunModel scrollOffset={scrollOffset} />
       )}
 
-      {/* Camera animation */}
-      <CameraRig />
+      {/* Render story icon for current page */}
+      {currentPage > 0 && currentPage <= 3 && (
+        <StoryIcon3D
+          type={stories[currentPage - 1]}
+          position={iconPosition}
+          theme={theme}
+        />
+      )}
+
+      {/* Camera */}
+      <PerspectiveCamera
+        makeDefault
+        position={[0, 0, 12]}
+        fov={75}
+      />
     </>
   );
 }
 
-const Hero3D = () => {
+const Hero3D: React.FC<Hero3DProps> = ({ onScrollUpdate }) => {
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     return savedTheme || 'light';
   });
 
   useEffect(() => {
-    // Listen for theme changes
-    const handleStorageChange = () => {
-      const newTheme = localStorage.getItem('theme') || 'light';
-      setTheme(newTheme);
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Also check for theme attribute changes
     const observer = new MutationObserver(() => {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       setTheme(isDark ? 'dark' : 'light');
@@ -99,17 +92,14 @@ const Hero3D = () => {
       attributeFilter: ['data-theme'],
     });
 
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, []);
 
   return (
     <div className="hero-3d-background">
       <Canvas>
         <ScrollControls pages={4} damping={0.1}>
-          <Scene theme={theme} />
+          <Scene theme={theme} onScrollUpdate={onScrollUpdate} />
         </ScrollControls>
       </Canvas>
     </div>

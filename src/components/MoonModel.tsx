@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Sphere } from '@react-three/drei';
 import * as THREE from 'three';
@@ -9,106 +9,137 @@ interface MoonModelProps {
 
 const MoonModel: React.FC<MoonModelProps> = ({ scrollOffset = 0 }) => {
   const moonRef = useRef<THREE.Mesh>(null);
-  const glowRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
     if (moonRef.current) {
-      // Slow rotation to show different moon phases
-      moonRef.current.rotation.y = state.clock.getElapsedTime() * 0.05;
-      
-      // Scroll-based animations
-      const scale = 1 + scrollOffset * 0.3;
-      moonRef.current.scale.setScalar(scale);
-      
-      // Move moon based on scroll
-      moonRef.current.position.y = -scrollOffset * 2;
-    }
-
-    // Pulsing neon glow effect
-    if (glowRef.current) {
-      const pulse = Math.sin(state.clock.getElapsedTime() * 0.8) * 0.15 + 1;
-      glowRef.current.scale.setScalar(pulse);
+      // Rotation based on scroll to show different phases
+      moonRef.current.rotation.y = scrollOffset * Math.PI * 2;
+      moonRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.05) * 0.05;
     }
   });
 
-  // Create procedural crater texture
-  const createCraterTexture = (): THREE.CanvasTexture => {
+  // Create enhanced procedural crater texture
+  const { moonTexture, bumpMap } = useMemo(() => {
     const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 512;
+    canvas.width = 1024;
+    canvas.height = 1024;
     const ctx = canvas.getContext('2d');
 
     if (!ctx) {
       throw new Error('Could not get 2D context');
     }
 
-    // Base moon color
-    ctx.fillStyle = '#e0e0e0';
-    ctx.fillRect(0, 0, 512, 512);
+    // Base moon color with subtle variations
+    const gradient = ctx.createRadialGradient(512, 512, 0, 512, 512, 512);
+    gradient.addColorStop(0, '#f0f0f0');
+    gradient.addColorStop(0.5, '#e0e0e0');
+    gradient.addColorStop(1, '#c0c0c0');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1024, 1024);
 
-    // Add craters
-    for (let i = 0; i < 50; i++) {
-      const x = Math.random() * 512;
-      const y = Math.random() * 512;
-      const radius = Math.random() * 30 + 5;
+    // Add many detailed craters
+    for (let i = 0; i < 150; i++) {
+      const x = Math.random() * 1024;
+      const y = Math.random() * 1024;
+      const radius = Math.random() * 50 + 10;
       
-      const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-      gradient.addColorStop(0, '#a0a0a0');
-      gradient.addColorStop(0.5, '#b0b0b0');
-      gradient.addColorStop(1, '#e0e0e0');
+      // Crater shadow
+      const craterGradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      craterGradient.addColorStop(0, '#707070');
+      craterGradient.addColorStop(0.3, '#909090');
+      craterGradient.addColorStop(0.7, '#b0b0b0');
+      craterGradient.addColorStop(1, '#e0e0e0');
       
-      ctx.fillStyle = gradient;
+      ctx.fillStyle = craterGradient;
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
+      
+      // Crater rim highlight
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x + radius * 0.3, y - radius * 0.3, radius * 0.9, 0, Math.PI * 2);
+      ctx.stroke();
     }
 
-    const texture = new THREE.CanvasTexture(canvas);
-    return texture;
-  };
+    // Add surface texture noise
+    const imageData = ctx.getImageData(0, 0, 1024, 1024);
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      const noise = (Math.random() - 0.5) * 20;
+      imageData.data[i] += noise;
+      imageData.data[i + 1] += noise;
+      imageData.data[i + 2] += noise;
+    }
+    ctx.putImageData(imageData, 0, 0);
 
-  const moonTexture = createCraterTexture();
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+
+    // Create bump map for 3D effect
+    const bumpCanvas = document.createElement('canvas');
+    bumpCanvas.width = 1024;
+    bumpCanvas.height = 1024;
+    const bumpCtx = bumpCanvas.getContext('2d');
+    if (bumpCtx) {
+      bumpCtx.fillStyle = '#808080';
+      bumpCtx.fillRect(0, 0, 1024, 1024);
+      
+      for (let i = 0; i < 150; i++) {
+        const x = Math.random() * 1024;
+        const y = Math.random() * 1024;
+        const radius = Math.random() * 50 + 10;
+        
+        const bumpGradient = bumpCtx.createRadialGradient(x, y, 0, x, y, radius);
+        bumpGradient.addColorStop(0, '#000000');
+        bumpGradient.addColorStop(0.5, '#404040');
+        bumpGradient.addColorStop(1, '#808080');
+        
+        bumpCtx.fillStyle = bumpGradient;
+        bumpCtx.beginPath();
+        bumpCtx.arc(x, y, radius, 0, Math.PI * 2);
+        bumpCtx.fill();
+      }
+    }
+    
+    const bump = new THREE.CanvasTexture(bumpCanvas);
+
+    return { moonTexture: texture, bumpMap: bump };
+  }, []);
 
   return (
-    <group position={[-4, 0, -2]}>
-      {/* Outer neon glow */}
-      <Sphere ref={glowRef} args={[2.5, 64, 64]}>
-        <meshBasicMaterial
-          color="#00d4ff"
-          transparent
-          opacity={0.2}
-          side={THREE.BackSide}
-        />
-      </Sphere>
-
-      {/* Main moon body */}
-      <Sphere ref={moonRef} args={[2, 64, 64]}>
+    <group position={[-8, 0, 0]}>
+      {/* Main moon body - much larger and more detailed */}
+      <Sphere ref={moonRef} args={[7, 128, 128]}>
         <meshStandardMaterial
           map={moonTexture}
-          color="#d0d0d0"
+          bumpMap={bumpMap}
+          bumpScale={0.3}
+          color="#d8d8d8"
           emissive="#00d4ff"
-          emissiveIntensity={0.3}
-          roughness={0.8}
-          metalness={0.1}
+          emissiveIntensity={0.15}
+          roughness={0.9}
+          metalness={0.05}
         />
       </Sphere>
 
-      {/* Neon edge glow */}
-      <Sphere args={[2.05, 64, 64]}>
-        <meshBasicMaterial
-          color="#b537f2"
-          transparent
-          opacity={0.3}
-          side={THREE.BackSide}
-        />
-      </Sphere>
-
-      {/* Point light from moon - neon blue */}
+      {/* Rim light for neon edge effect */}
       <pointLight
-        position={[0, 0, 0]}
-        intensity={1.5}
-        distance={15}
+        position={[-3, 0, 0]}
+        intensity={2}
+        distance={20}
         color="#00d4ff"
+        decay={2}
+      />
+      
+      {/* Secondary neon accent */}
+      <pointLight
+        position={[-2, 2, 2]}
+        intensity={1}
+        distance={15}
+        color="#b537f2"
+        decay={2}
       />
     </group>
   );
