@@ -2,10 +2,7 @@ import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Sphere } from '@react-three/drei';
 import * as THREE from 'three';
-
-interface MoonModelProps {
-  scrollOffset?: number;
-}
+import { MoonModelProps } from '../interfaces';
 
 const MoonModel: React.FC<MoonModelProps> = ({ scrollOffset = 0 }) => {
   const moonRef = useRef<THREE.Mesh>(null);

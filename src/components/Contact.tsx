@@ -2,12 +2,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
-
-interface FormData {
-  name: string;
-  email: string;
-  message: string;
-}
+import { FormData } from '../interfaces';
 
 const Contact: React.FC = () => {
   const ref = useRef(null);

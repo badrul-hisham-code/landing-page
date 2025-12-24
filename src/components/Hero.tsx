@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Hero3D from './Hero3D';
-
-interface StoryPoint {
-  title: string;
-  description: string;
-  icon: 'coffee' | 'laptop' | 'terminal' | 'rocket';
-}
+import { StoryPoint } from '../interfaces';
 
 const lightModeStories: StoryPoint[] = [
   {

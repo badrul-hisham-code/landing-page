@@ -1,24 +1,12 @@
 import { motion, useInView, Variants } from 'framer-motion';
 import { useRef } from 'react';
 import { FaLinkedin, FaGithub, FaTwitter, FaEnvelope } from 'react-icons/fa';
+import { TeamMember } from '../interfaces';
 
 // Import team member images
 import muazImage from '../assets/team/muaz.jpg';
 import mas from '../assets/team/mas.jpg'
 import bad from '../assets/team/bruh.png'
-
-interface TeamMember {
-  name: string;
-  role: string;
-  image: string;
-  bio: string;
-  social: {
-    linkedin?: string;
-    github?: string;
-    twitter?: string;
-    email?: string;
-  };
-}
 
 const teamData: TeamMember[] = [
   {

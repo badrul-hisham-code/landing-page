@@ -4,17 +4,7 @@ import { PerspectiveCamera, Environment } from '@react-three/drei';
 import SunModel from './SunModel';
 import MoonModel from './MoonModel';
 import StoryIcon3D from './StoryIcon3D';
-
-interface Hero3DProps {
-  onScrollUpdate?: (progress: number) => void;
-}
-
-// Scene component that receives theme and scroll
-interface SceneProps {
-  theme: string;
-  onScrollUpdate?: (progress: number) => void;
-  scrollOffset: number;
-}
+import { Hero3DProps, SceneProps } from '../interfaces';
 
 function Scene({ theme, onScrollUpdate, scrollOffset }: SceneProps) {
   // Notify parent of scroll progress when it changes
