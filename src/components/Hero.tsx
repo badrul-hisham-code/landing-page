@@ -5,7 +5,7 @@ import Hero3D from './Hero3D';
 interface StoryPoint {
   title: string;
   description: string;
-  icon: 'coffee' | 'laptop' | 'blueprint' | 'terminal' | 'rocket' | 'energy';
+  icon: 'coffee' | 'laptop' | 'terminal' | 'rocket';
 }
 
 const lightModeStories: StoryPoint[] = [
@@ -19,11 +19,6 @@ const lightModeStories: StoryPoint[] = [
     description: 'Code reviews and knowledge sharing. Building solutions together as a team.',
     icon: 'laptop',
   },
-  {
-    title: 'Architecture & Design',
-    description: 'Whiteboarding system designs and planning scalable architectures that matter.',
-    icon: 'blueprint',
-  },
 ];
 
 const darkModeStories: StoryPoint[] = [
@@ -36,11 +31,6 @@ const darkModeStories: StoryPoint[] = [
     title: 'Production Deployments',
     description: 'CI/CD pipelines running, monitoring dashboards active. Pushing code live.',
     icon: 'rocket',
-  },
-  {
-    title: 'Deadline Crunch',
-    description: 'Energy drinks, coffee, and pure focus. Late-night commits and delivering on promises.',
-    icon: 'energy',
   },
 ];
 

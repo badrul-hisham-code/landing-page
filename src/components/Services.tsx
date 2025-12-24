@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { FaCode, FaCloud, FaMobile, FaChartLine, FaShieldAlt, FaCog } from 'react-icons/fa';
+import { FaCode, FaMobile, FaCog } from 'react-icons/fa';
 
 const servicesData = [
   {
@@ -9,25 +9,11 @@ const servicesData = [
     title: 'Custom Software Development',
     description: 'Tailored software solutions designed to meet your unique business requirements and drive growth.',
   },
-  {
-    icon: <FaCloud />,
-    title: 'Cloud Solutions',
-    description: 'Scalable cloud infrastructure and migration services to modernize your business operations.',
-  },
+
   {
     icon: <FaMobile />,
     title: 'Mobile App Development',
     description: 'Native and cross-platform mobile applications that deliver exceptional user experiences.',
-  },
-  {
-    icon: <FaChartLine />,
-    title: 'Data Analytics',
-    description: 'Transform your data into actionable insights with advanced analytics and visualization tools.',
-  },
-  {
-    icon: <FaShieldAlt />,
-    title: 'Cybersecurity',
-    description: 'Comprehensive security solutions to protect your digital assets and ensure compliance.',
   },
   {
     icon: <FaCog />,
