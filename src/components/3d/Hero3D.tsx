@@ -4,7 +4,7 @@ import { PerspectiveCamera, Environment } from '@react-three/drei';
 import SunModel from './SunModel';
 import MoonModel from './MoonModel';
 import StoryIcon3D from './StoryIcon3D';
-import { Hero3DProps, SceneProps } from '../interfaces';
+import { Hero3DProps, SceneProps } from '../../interfaces';
 
 function Scene({ theme, onScrollUpdate, scrollOffset }: SceneProps) {
   // Notify parent of scroll progress when it changes

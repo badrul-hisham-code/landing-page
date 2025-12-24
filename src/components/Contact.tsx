@@ -3,6 +3,7 @@ import { useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { FormData } from '../interfaces';
+import { contactInfo, contactContent } from '../data';
 
 const Contact: React.FC = () => {
   const ref = useRef(null);
@@ -23,7 +24,7 @@ const Contact: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission (you can integrate with a backend or email service)
-    alert('Thank you for your message! We will get back to you soon.');
+    alert(contactContent.successMessage);
     setFormData({ name: '', email: '', message: '' });
   };
 
@@ -37,8 +38,8 @@ const Contact: React.FC = () => {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.8 }}
         >
-          <h2>Get In Touch</h2>
-          <p>Ready to transform your business? Contact us today to discuss your project.</p>
+          <h2>{contactContent.title}</h2>
+          <p>{contactContent.description}</p>
 
           <motion.form
             className="contact-form"
@@ -86,7 +87,7 @@ const Contact: React.FC = () => {
             </div>
 
             <button type="submit" className="btn btn-primary">
-              Send Message
+              {contactContent.submitButtonText}
             </button>
           </motion.form>
 
@@ -98,15 +99,15 @@ const Contact: React.FC = () => {
           >
             <div className="contact-item">
               <FaEnvelope />
-              <span>contact@lunaris.com</span>
+              <span>{contactInfo.email}</span>
             </div>
             <div className="contact-item">
               <FaPhone />
-              <span>+1 (555) 123-4567</span>
+              <span>{contactInfo.phone}</span>
             </div>
             <div className="contact-item">
               <FaMapMarkerAlt />
-              <span>San Francisco, CA</span>
+              <span>{contactInfo.location}</span>
             </div>
           </motion.div>
         </motion.div>

@@ -1,32 +1,12 @@
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
+import { motion, useInView, Variants } from 'framer-motion';
 import { useRef } from 'react';
-import { FaCode, FaMobile, FaCog } from 'react-icons/fa';
-
-const servicesData = [
-  {
-    icon: <FaCode />,
-    title: 'Custom Software Development',
-    description: 'Tailored software solutions designed to meet your unique business requirements and drive growth.',
-  },
-
-  {
-    icon: <FaMobile />,
-    title: 'Mobile App Development',
-    description: 'Native and cross-platform mobile applications that deliver exceptional user experiences.',
-  },
-  {
-    icon: <FaCog />,
-    title: 'IT Consulting',
-    description: 'Strategic technology consulting to optimize your IT infrastructure and processes.',
-  },
-];
+import { servicesData } from '../data';
 
 const Services = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -36,14 +16,13 @@ const Services = () => {
     },
   };
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
         duration: 0.6,
-        ease: 'easeOut',
       },
     },
   };

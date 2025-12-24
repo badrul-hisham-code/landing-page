@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Box, Cylinder, Torus } from '@react-three/drei';
 import * as THREE from 'three';
-import { StoryIcon3DProps } from '../interfaces';
+import { StoryIcon3DProps } from '../../interfaces';
 
 const StoryIcon3D: React.FC<StoryIcon3DProps> = ({ type, position, theme }) => {
   const groupRef = useRef<THREE.Group>(null);

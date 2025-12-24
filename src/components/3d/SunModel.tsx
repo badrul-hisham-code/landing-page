@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Sphere, MeshDistortMaterial } from '@react-three/drei';
 import * as THREE from 'three';
-import { SunModelProps } from '../interfaces';
+import { SunModelProps } from '../../interfaces';
 
 const SunModel: React.FC<SunModelProps> = ({ scrollOffset = 0 }) => {
   const sunRef = useRef<THREE.Mesh>(null);
