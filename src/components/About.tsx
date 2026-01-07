@@ -1,11 +1,11 @@
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { aboutContent, statsData } from '../data';
+import { motion } from "framer-motion";
+import { useInView } from "framer-motion";
+import { useRef } from "react";
+import { aboutContent, statsData } from "../data";
 
 const About = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
     <section id="about" className="about-section">
@@ -23,7 +23,9 @@ const About = () => {
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h2>About <span className="gradient-text">LUNARIS</span></h2>
+            <h2>
+              About <span className="gradient-text">Luna Lab</span>
+            </h2>
             {aboutContent.paragraphs.map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
             ))}

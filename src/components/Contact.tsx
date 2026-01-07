@@ -1,31 +1,44 @@
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
-import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
-import { FormData } from '../interfaces';
-import { contactInfo, contactContent } from '../data';
+import { motion } from "framer-motion";
+import { useInView } from "framer-motion";
+import { useRef } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
+import { contactInfo, contactContent } from "../data";
+
+const contactSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+
+type ContactFormData = z.infer<typeof contactSchema>;
 
 const Contact: React.FC = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    message: '',
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      message: "",
+    },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Handle form submission (you can integrate with a backend or email service)
+  const onSubmit: SubmitHandler<ContactFormData> = async (data) => {
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log(data);
     alert(contactContent.successMessage);
-    setFormData({ name: '', email: '', message: '' });
+    reset();
   };
 
   return (
@@ -43,22 +56,34 @@ const Contact: React.FC = () => {
 
           <motion.form
             className="contact-form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
+            noValidate
           >
             <div className="form-group">
               <label htmlFor="name">Name</label>
               <input
                 type="text"
                 id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
+                {...register("name")}
                 placeholder="Your Name"
+                className={errors.name ? "input-error" : ""}
               />
+              {errors.name && (
+                <span
+                  className="error-message"
+                  style={{
+                    color: "red",
+                    fontSize: "0.875rem",
+                    marginTop: "0.25rem",
+                    display: "block",
+                  }}
+                >
+                  {errors.name.message}
+                </span>
+              )}
             </div>
 
             <div className="form-group">
@@ -66,28 +91,54 @@ const Contact: React.FC = () => {
               <input
                 type="email"
                 id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
+                {...register("email")}
                 placeholder="your.email@example.com"
+                className={errors.email ? "input-error" : ""}
               />
+              {errors.email && (
+                <span
+                  className="error-message"
+                  style={{
+                    color: "red",
+                    fontSize: "0.875rem",
+                    marginTop: "0.25rem",
+                    display: "block",
+                  }}
+                >
+                  {errors.email.message}
+                </span>
+              )}
             </div>
 
             <div className="form-group">
               <label htmlFor="message">Message</label>
               <textarea
                 id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                required
+                {...register("message")}
                 placeholder="Tell us about your project..."
+                className={errors.message ? "input-error" : ""}
               />
+              {errors.message && (
+                <span
+                  className="error-message"
+                  style={{
+                    color: "red",
+                    fontSize: "0.875rem",
+                    marginTop: "0.25rem",
+                    display: "block",
+                  }}
+                >
+                  {errors.message.message}
+                </span>
+              )}
             </div>
 
-            <button type="submit" className="btn btn-primary">
-              {contactContent.submitButtonText}
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Sending..." : contactContent.submitButtonText}
             </button>
           </motion.form>
 
