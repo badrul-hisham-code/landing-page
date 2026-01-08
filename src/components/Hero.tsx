@@ -29,8 +29,11 @@ const Hero: React.FC = () => {
   const stories = theme === "dark" ? darkModeStories : lightModeStories;
   const textSide = theme === "dark" ? "right" : "left";
 
-  // Calculate which page we're on (0-3)
-  const currentPage = Math.floor(scrollProgress * 4);
+  // Calculate which page we're on based on scroll progress
+  // Page 0: 0 - 0.33 (main hero)
+  // Page 1: 0.33 - 0.66 (first story)
+  // Page 2: 0.66 - 1.0 (second story)
+  const currentPage = scrollProgress < 0.33 ? 0 : scrollProgress < 0.66 ? 1 : 2;
 
   return (
     <section className="hero-section">
