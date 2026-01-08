@@ -34,11 +34,31 @@ const Contact: React.FC = () => {
   });
 
   const onSubmit: SubmitHandler<ContactFormData> = async (data) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log(data);
-    alert(contactContent.successMessage);
-    reset();
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to send message");
+      }
+
+      alert(contactContent.successMessage);
+      reset();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to send your message. Please try again later."
+      );
+    }
   };
 
   return (
